@@ -1,45 +1,38 @@
 #include "mbed.h"
 
-// Global variables
-InterruptIn button(PC_13);  // Define the button pin as InterruptIn
-BufferedSerial pc(USBTX, USBRX);    // Define BufferedSerial for communication
-volatile bool print_flag = false;   // Flag to indicate button press
+InterruptIn button(PC_13);
+BufferedSerial pc(USBTX, USBRX);
+volatile bool print_flag = false;
+int n;
 
+int fib(int n) {
+    if (n <= 1) {
+        return n;
+    } else {
+        return fib(n - 1) + fib(n - 2);
+    }
+}
 
-void printFibonacciLoop(int n) {
-    int a = 0, b = 1, next;
-
+void printFib(int n) {
     for (int i = 0; i < n; ++i) {
-        if (i <= 1)
-            next = i;
-        else {
-            next = a + b;
-            a = b;
-            b = next;
-        }
-        printf("%d, ", next);
+        printf("%d, ", fib(i));
     }
     printf("\n");
 }
 
 void button_pressed() {
-    print_flag = true; 
+    print_flag = true;
 }
 
 int main() {
-    // Attach the interrupt handler to the button press event
     button.fall(&button_pressed);
     pc.set_baud(9600);
 
-    //int n;
-    //printf("Enter the number of terms: ");
-    //scanf("%d", &n);
-
     while (1) {
         if (print_flag) {
-            printFibonacciLoop(9);
-            print_flag = false; 
+            printFib(9);
+            print_flag = false;
         }
-        ThisThread::sleep_for(100ms); 
+        ThisThread::sleep_for(100ms);
     }
 }
